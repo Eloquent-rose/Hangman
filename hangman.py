@@ -1,10 +1,14 @@
 import tkinter as tk
+from tkinter import *  
 from tkinter import messagebox as mb
 import tkinter.font as f
 import random as r
-
+from PIL import ImageTk, Image
+import winsound
 
 La = ['Rab-Ne-Banadhi-Jodi', 'Gaja', 'Mr-and-Mrs-Ramachari', 'Fida', 'Love-Mocktail']
+count = 0
+attempts = 9
 
 def load():
     
@@ -22,8 +26,6 @@ def load():
     EndButton.place(x = 100, y = 200)
     EndButton['font'] = f.Font(family = 'Helvetica' )
     EndButton.config(width = 20, height = 2)
-    
-    
     
         
 def add(n = 0):
@@ -101,12 +103,13 @@ def StartPlay():
     
     x = r.randint(0, (len(La)-1))
     st = La[x]
+    Letters = ['a', 'e', 'i', 'o', 'u', '-']
     entry = ""
     
     finalString = ""
     for i in range(len(st)):
         
-        if (st[i].lower() == 'a' or st[i].lower() == 'e' or st[i].lower() == 'i' or st[i].lower() == 'o' or st[i].lower() == 'u' or st[i].lower() == '-'):
+        if st[i].lower() in Letters:
             finalString = finalString + str(st[i]) + " "
         
         else:
@@ -115,41 +118,99 @@ def StartPlay():
     finalString = "Guess the movie name : " + finalString         
         
     Label_movie = tk.Label(AB) 
-    Label_movie.place(x = 5, y = 10)
-    Label_movie.config( text = finalString, width = 61, height = 6, bg = "black", fg = "white", bd = 5, font=("Helvetica", 11))
+    Label_movie.place(x = 11, y = 10)
+    Label_movie.config( text = finalString, width = 50, height = 5, bg = "black", fg = "white", bd = 5, font=("Helvetica", 11))
     Label_movie.pack(side = "top") 
     
     Options = tk. StringVar()
     
     Label_input = tk.Label(AB, text = "Enter the letter : ")
-    Label_input.place(x = 10, y = 120)
+    Label_input.place(x = 100, y = 120)
     Label_input.config(font=("Helvetica", 12))
     
     Entry_option = tk.Entry(AB, textvariable = Options)
-    Entry_option.place(x = 127, y = 123)
+    Entry_option.place(x = 220, y = 123)
     Entry_option.config(width = 5)
     
+    text = "Hello! Okay then let's start!"
+    text1 = "more chances!"
+    
+    Label_result = tk.Label(AB)
+    Label_result.place(x = 70, y = 175)
+    Label_result.config(height = 2, width = 30, bg = "white", bd = 10)
+    
+    canvas_image = Label(AB, width = 3, height = 1, bg = "white", bd = 10)   
+    canvas_image.place(x = 90, y = 250)
+    
+    canvas_attempts = Label(AB, width = 18, height = 2, bg = "white")
+    canvas_attempts.place(x = 180, y = 260)
+    canvas_attempts.config(text = text1, font=("Helvetica", 12))
+    
+    res = str(attempts - count)
+    Label_result.config(text = text, font=("Helvetica", 12))
+    canvas_image.config(text = res, font=("Helvetica", 25))   
+
+0
     def check():
+        
+        global count 
+        global attempts
+        
         entry = str(Entry_option.get())
     
         if not entry.isalpha():
+            
             mb.showerror("Error", "Not a valid character")
+            Entry_option.delete(0, len(entry))
+            
+        elif len(entry) > 1:
+            
+            mb.showerror("Error", "Too many arguments")
+            Entry_option.delete(0, len(entry))
         
         else:
             
-            Label_result = tk.Label(AB)
-            Label_result.place(x = 120, y = 175)
-            Label_result.config(height = 3, width = 30, bg = "white")
-            # Label_result.pack()
+            finalString = ""
+            Entry_option.delete(0, len(entry))
             
-            Label_image = tk.Label(AB)
-            Label_image.place(x = 155, y = 245)
-            Label_image.config(height = 10, width = 20, bg = "black")
-            # Label_image.pack()
+            if entry.lower() in st.lower():
+                if not entry.lower() in Letters:
+                    Letters.append(entry.lower())
+                    text = "Hurray!! Try picking another letter."
+                    winsound.Beep(10000, 1000) 
+                else:
+                    text = "Letter already attempted!."
+                    winsound.Beep(5000, 1000)
+                    
+            else:
+                text = "Oops! No match, guess another letter."
+                count = count + 1
+                winsound.Beep(1000, 100) 
+                
+            print(Letters)
+            
+            for i in range (len(st)):
+                
+                if st[i].lower() in Letters:
+                    finalString = finalString + str(st[i]) + " "
+        
+                else:
+                    finalString = finalString + '_' + "  "
+            
+            finalString = "Guess the movie name : " + finalString 
+            
+            res = str(attempts - count)
+            Label_result.config(text = text)
+            Label_movie.config(text =  finalString)
+            canvas_image.config(text = res, font=("Helvetica", 25)) 
+            
+            if res == 0:
+                text = "Game over!"
+                Label_result.config(text = text)
+                     
 
     sButton = tk.Button(AB, text = "Check!", bg = "black", fg = "white", activebackground = "grey", activeforeground = "black", command = check)
-    sButton.place(x = 170, y = 120)
-       
+    sButton.place(x = 270, y = 120)   
     
     
 GUI = tk.Tk()
@@ -161,8 +222,5 @@ ButtonPlay = tk.Button(GUI, text = "Yayy! Hangman", bg = "black", fg = "white", 
 ButtonPlay['font'] = f.Font(family = 'Helvetica' )
 ButtonPlay.place(x = 11, y = 10)
 ButtonPlay.config(width = 38, height = 3)
-
-
-
 
 GUI.mainloop()
